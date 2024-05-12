@@ -30,7 +30,7 @@ linters-settings:
             prevent_unmaintained_packages:
                 allow:
                     - $gostd
-                    - github.com/ricochhet/simpledownload/simpledownload
+                    - github.com/ricochhet/simpledownload
 issues:
     exclude-dirs:
         - thirdparty/

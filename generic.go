@@ -7,13 +7,15 @@ import (
 )
 
 func Download(url string) ([]byte, error) {
-	return DownloadWithContext(context.TODO(), url)
+	return DownloadWithContext(context.TODO(), DefaultDownloadMessenger(), url)
 }
 
-func DownloadWithContext(ctx context.Context, url string) ([]byte, error) {
+func DownloadWithContext(ctx context.Context, messenger DownloadMessenger, url string) ([]byte, error) {
 	if url == "" {
 		return nil, errDownloadURLEmpty
 	}
+
+	messenger.StartDownload(url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
