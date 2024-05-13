@@ -50,12 +50,16 @@ func DefaultHashValidator(filePath, fileHash, fileName string) error {
 	return errFileHashNoMatch
 }
 
-func File(url, fileHash, fileName, filePath string) error {
-	return FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, fileHash, fileName, filePath, nil)
+func File(url, fileName, filePath string) error {
+	return FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, "", fileName, filePath, nil)
 }
 
-func FileWithBytes(url, fileHash, fileName, filePath string) ([]byte, error) {
-	if err := FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, fileHash, fileName, filePath, nil); err != nil {
+func FileValidated(url, fileHash, fileName, filePath string) error {
+	return FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, fileHash, fileName, filePath, DefaultHashValidator)
+}
+
+func FileWithBytes(url, fileName, filePath string) ([]byte, error) {
+	if err := FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, "", fileName, filePath, nil); err != nil {
 		return nil, err
 	}
 
@@ -63,7 +67,16 @@ func FileWithBytes(url, fileHash, fileName, filePath string) ([]byte, error) {
 }
 
 //nolint:lll // wontfix
-func FileWithBytesAndContext(ctx context.Context, state DownloadMessenger, url, fileHash, fileName, filePath string, hashValidator func(string, string, string) error) ([]byte, error) {
+func FileWithBytesValidated(url, fileHash, fileName, filePath string) ([]byte, error) {
+	if err := FileWithContext(context.TODO(), DefaultDownloadMessenger(), url, fileHash, fileName, filePath, DefaultHashValidator); err != nil {
+		return nil, err
+	}
+
+	return read(filePath, fileName)
+}
+
+//nolint:lll // wontfix
+func FileWithContextAndBytes(ctx context.Context, state DownloadMessenger, url, fileHash, fileName, filePath string, hashValidator func(string, string, string) error) ([]byte, error) {
 	if err := FileWithContext(ctx, state, url, fileHash, fileName, filePath, hashValidator); err != nil {
 		return nil, err
 	}

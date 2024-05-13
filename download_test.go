@@ -8,7 +8,7 @@ import (
 	"github.com/ricochhet/simpledownload"
 )
 
-const testDownloadURL = "https://raw.githubusercontent.com/ricochhet/ricochhet/main/README.md"
+const testDownloadURL = "https://raw.githubusercontent.com/ricochhet/simpledownload/main/LICENSE"
 
 func TestGenericDownload(t *testing.T) {
 	t.Parallel()
@@ -31,11 +31,32 @@ func TestGenericDownload(t *testing.T) {
 func TestFileDownload(t *testing.T) {
 	t.Parallel()
 
-	if err := simpledownload.File(testDownloadURL, "aaabbbccc", "README.md", "./.test/"); err != nil {
+	if err := simpledownload.File(testDownloadURL, "LICENSE", "./.test/"); err != nil {
 		t.Fatal(err)
 	}
 
-	if bytes, err := simpledownload.FileWithBytes(testDownloadURL, "aaabbbccc", "README.md", "./.test/"); err != nil || len(bytes) == 0 {
+	if bytes, err := simpledownload.FileWithBytes(testDownloadURL, "LICENSE", "./.test/"); err != nil || len(bytes) == 0 {
+		t.Fatal("download fail")
+	}
+}
+
+//nolint:lll // test only
+func TestFileValidated(t *testing.T) {
+	t.Parallel()
+
+	if err := simpledownload.FileValidated(testDownloadURL, "aaabbbccc", "LICENSE", "./.test/"); err == nil {
+		t.Fatal("download fail")
+	}
+
+	if bytes, err := simpledownload.FileWithBytesValidated(testDownloadURL, "aaabbbccc", "LICENSE", "./.test/"); err == nil || len(bytes) != 0 {
+		t.Fatal("download fail")
+	}
+
+	if err := simpledownload.FileValidated(testDownloadURL, "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef", "LICENSE", "./.test/"); err != nil {
+		t.Fatal(err)
+	}
+
+	if bytes, err := simpledownload.FileWithBytesValidated(testDownloadURL, "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef", "LICENSE", "./.test/"); err != nil || len(bytes) == 0 {
 		t.Fatal("download fail")
 	}
 }
@@ -50,15 +71,15 @@ func TestFileDownloadWithHash(t *testing.T) {
 		},
 	}
 
-	if err := simpledownload.FileWithContext(context.TODO(), testMessenger, testDownloadURL, "1c2b178a5fe8919c97c199cd1bea39075ef7260bed3794922a376896831f1516", "README.md", "./.test/", simpledownload.DefaultHashValidator); err != nil {
+	if err := simpledownload.FileWithContext(context.TODO(), testMessenger, testDownloadURL, "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef", "LICENSE", "./.test/", simpledownload.DefaultHashValidator); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := simpledownload.FileWithContext(context.TODO(), testMessenger, testDownloadURL, "", "README.md", "./.test/", simpledownload.DefaultHashValidator); err == nil {
+	if err := simpledownload.FileWithContext(context.TODO(), testMessenger, testDownloadURL, "", "LICENSE", "./.test/", simpledownload.DefaultHashValidator); err == nil {
 		t.Fatal("empty hash has validated successfully")
 	}
 
-	if bytes, err := simpledownload.FileWithBytesAndContext(context.TODO(), testMessenger, testDownloadURL, "", "README.md", "./.test/", nil); err != nil || len(bytes) == 0 {
+	if bytes, err := simpledownload.FileWithContextAndBytes(context.TODO(), testMessenger, testDownloadURL, "", "LICENSE", "./.test/", nil); err != nil || len(bytes) == 0 {
 		t.Fatal("download fail")
 	}
 }
