@@ -59,7 +59,7 @@ linters:
         - errorlint
         - exhaustive
         - exhaustruct
-        - exportloopref
+        # - exportloopref // deprecated
         - fatcontext
         - forcetypeassert
         - funlen
